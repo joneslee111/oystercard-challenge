@@ -22,13 +22,6 @@ describe Oystercard do
     end
   end
 
-  describe '#deduct' do 
-    it 'should deduct money' do
-      subject.top_up(50)
-      expect(subject.deduct(10)).to eq(40)
-    end
-  end
-  
   describe '#touch_in, #touch_out & in_journey?' do 
     it "responds to touch_in" do 
       expect(subject).to respond_to(:touch_in)

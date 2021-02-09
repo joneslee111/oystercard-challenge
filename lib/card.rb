@@ -27,7 +27,8 @@ class Oystercard
     @journey = false
     deduct(MIN_BALANCE)
   end 
-
+ 
+private
   def deduct(amount)
     @balance -= amount
     return @balance
