@@ -3,7 +3,9 @@ require_relative '../lib/card.rb'
 describe Oystercard do 
 
   let (:max) { Oystercard::MAX_BALANCE }
-  let (:min) { Oystercard::MIN_BALANCE}
+  let (:min) { Oystercard::MIN_BALANCE }
+  let (:station) { double :station }
+  let (:exit_station) { double :station }
   
   it "responds to balance method " do
       expect(subject).to respond_to(:balance)
@@ -34,23 +36,59 @@ describe Oystercard do
     it "responds to touch_in" do 
       expect(subject).to respond_to(:touch_in)
       subject.top_up(max)
-      subject.touch_in
+      subject.touch_in(station)
       expect(subject).to be_in_journey
     end 
     it "prevents touch in if balance below £1" do 
-      expect{subject.touch_in}.to raise_error("Insufficient Balance") 
+      expect{subject.touch_in(station)}.to raise_error("Insufficient Balance") 
     end 
     it "respond to touch_out" do 
       expect(subject).to respond_to(:touch_out) 
       subject.top_up(max)
-      subject.touch_in
-      expect {subject.touch_out}.to change{subject.balance}.by(-Oystercard::MIN_BALANCE)
-      subject.touch_out
+      subject.touch_in(station)
+      expect {subject.touch_out(station)}.to change{subject.balance}.by(-Oystercard::MIN_BALANCE)
+      subject.touch_out(station)
       expect(subject).not_to be_in_journey
     end 
     it "responds to in_journey? " do 
       expect(subject).to respond_to(:in_journey?)
     end 
   end
-end 
 
+  describe '#entry station' do
+    it 'should equal station'do
+      subject.top_up(min)
+      subject.touch_in(station)
+      expect(subject.entry_station).to eq station
+    end
+  end
+
+  describe '#exit_station' do
+    it 'should equal station' do
+      subject.top_up(min)
+      subject.touch_in(station)
+      subject.touch_out(station)
+      expect(subject.exit_station).to eq station
+    end
+  end
+
+  describe '#journeys' do
+    it 'has an empty list of journeys by default' do
+      expect(subject.journey_log).to be_empty
+    end
+
+     it 'touch in, touch out creates journey' do
+      subject.top_up(max)
+      subject.touch_in(station)
+      subject.touch_out(exit_station)
+      expect(subject.journey_log.first).to eq({entry:station, exit:exit_station})
+     end
+
+    it 'updates list of journeys' do
+      subject.top_up(max)
+      subject.touch_in(station)
+      subject.touch_out(exit_station)
+      expect(subject.journey_log.last).to eq({entry:station, exit:exit_station})
+      end
+    end
+end 
