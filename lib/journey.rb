@@ -11,12 +11,4 @@ class Journey
     @exit_station = station
   end
 
-
-
-
- #fare method should return the minimum fare (for the moment), or the penalty fare of 6 if there was either no entry station or no exit station.
-
-
-  # touch in + touch out
-  # touch in + no touch out
 end

@@ -43,11 +43,11 @@ describe Oystercard do
       expect{subject.touch_in(station)}.to raise_error("Insufficient Balance") 
     end 
     it "respond to touch_out" do 
-      expect(subject).to respond_to(:touch_out) 
+      # expect(subject).to respond_to(:touch_out) 
       subject.top_up(max)
       subject.touch_in(station)
       expect {subject.touch_out(station)}.to change{subject.balance}.by(-Oystercard::MIN_BALANCE)
-      subject.touch_out(station)
+      # subject.touch_out(station)
       expect(subject).not_to be_in_journey
     end 
     it "responds to in_journey? " do 
@@ -93,4 +93,18 @@ describe Oystercard do
       expect(subject.journey_log.length).to be > 1
       end
     end
+
+    it 'charges a penalty fare if touch_out is missed' do
+      subject.top_up(max)
+      subject.touch_in(station)
+      expect { subject.touch_in(station) }.to raise_error 'PENALTY CHARGE OF £6 FOR MISSING STATION'   
+    end
+
+    it 'charges a penalty fare if touch_in is missed' do
+      subject.top_up(max)
+      subject.touch_in(station)
+      subject.touch_out(station)
+      expect { subject.touch_out(station) }.to raise_error 'PENALTY CHARGE OF £6 FOR MISSING STATION'   
+    end
+
 end 
