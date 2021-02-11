@@ -5,18 +5,19 @@ class Oystercard
 
   def initialize
     @balance = 0
-    @entry_station = nil
-    @exit_station = nil
-    @journey = { entry:nil, exit:nil }
+    # @entry_station = nil
+    # @exit_station = nil
+    # @journey = { entry:nil, exit:nil }
     @journey_log = []
+    
     
   end
   
   def in_journey?
-    if @entry_station == nil
-      return false
+    if @journey_log.last.exit_station == nil
+      return true
     else 
-      true
+      false
     end
     # !!entry_station
     
@@ -30,20 +31,36 @@ class Oystercard
 
   def touch_in(station)
     fail 'Insufficient Balance' if @balance < MIN_BALANCE
-    @entry_station = station
-    @exit_station = nil
-    @journey[:entry] = @entry_station
+   # @entry_station = station
+   # @exit_station = nil
+   # @journey[:entry] = @entry_station
+    if journey_log.empty? || journey_log.last.exit_station != nil
+      @journey_log << Journey.new(station, nil)
+    else 
+    deduct(MIN_BALANCE*6)
+    fail 'PENALTY CHARGE OF £6 FOR MISSING STATION'
+
+    end
+
     
     end 
   
   def touch_out(station)
-    deduct(MIN_BALANCE)
-    @entry_station = nil
-    @exit_station = station
-    @journey[:exit] = @exit_station
-    @journey_log << @journey
-    @journey = { entry:nil, exit:nil }
-  end 
+    # @entry_station = nil
+    # @exit_station = station
+    # @journey[:exit] = @exit_station
+    # @journey_log << @journey
+    # @journey = { entry:nil, exit:nil }
+    # @journey_log.last.exit(station)
+    if journey_log.empty? || journey_log.last.exit_station == nil
+       @journey_log.last.exit(station)
+       deduct(MIN_BALANCE)
+    else
+      deduct(MIN_BALANCE*6)
+      fail 'PENALTY CHARGE OF £6 FOR MISSING STATION' if @journey_log << Journey.new(nil, station)
+       
+    end
+   end 
  
 private
   def deduct(amount)
